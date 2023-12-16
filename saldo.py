@@ -7,7 +7,7 @@ from functions import clear, write_menu, is_valid_name, erro_invalid, write_titl
 
 
 def save_transaction(username, tipo_transacao, quant):
-    filename = f"{username}_saldo.txt"
+    filename = (f"{username}_saldo.txt")
     with open(filename, 'a') as file:
         if tipo_transacao == 'deposito':
             file.write(f"Dep: +{quant}\n")

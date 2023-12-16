@@ -27,35 +27,39 @@ def menu_lotaria(user, users):
         menu_lotaria(user, users)
 
 def comprar_tokens(user, users):
+    from saldo import save_transaction
     clear()
     write_title('Comprar Tokens') 
     write_title(" 1 Token = 1€ ")
-    
+
     todas_linhas = []
     with open('register.txt', 'r') as file:
         todas_linhas = file.readlines()
 
+    for i, linha in enumerate(todas_linhas):
+        partes = linha.split()
+        if len(partes) >= (7) and partes[0] == user.nome:
+            try:
+                num = int(input("\nQuantos Tokens deseja comprar: "))
+                partes[2] = int(partes[2]) - num
+                partes[2] = str(partes[2])
+                partes[7] = int(partes[7]) + num
+                partes[7] = str(partes[7])
+            except ValueError:
+                print("Erro! Digite um valor numérico!")
+                comprar_tokens(user, users)
+            
+            todas_linhas[i] = " ".join(partes) + "\n"
+            print(f"Saldo Atualizado com sucesso!")
+            time.sleep(2)
+            save_transaction(user.nome, 'levantamento', num)
+            print(f"Histórico Atualizado com sucesso!")
+
     with open('register.txt', 'w') as file:
-        for linha in todas_linhas:
-            partes = linha.split()
-            if len(partes) >= (7) and partes[0] == user.nome:
-                try:
-                    num = int(input("\nQuantos Tokens deseja comprar: "))
-                    partes[2] = int(partes[2]) - (num*5)
-                    partes[2] = str(partes[2])
-                    partes[7] = int(partes[7]) + num
-                    partes[7] = str(partes[7])
-                except ValueError:
-                    print("Erro! Digite um valor numérico!")
-                    comprar_tokens(user, users)
-                    
-                nova_linha = " ".join(partes) + "\n"
-                file.write(nova_linha)
-                print(f"Saldo Actualizado com sucesso!")
-                time.sleep(2)
-                with open('saldo.txt', 'a') as file:
-                    file.write(f"-{num*5}\n")       
-                menu_lotaria(user, users)        
+        file.writelines(todas_linhas)
+    
+    menu_lotaria(user, users)
+        
      
     
     
