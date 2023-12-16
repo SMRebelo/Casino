@@ -1,6 +1,7 @@
 import sys
 import time
 import os
+import random
 
 sys.path.append(r'C:\Users\sergi\OneDrive\Documents')
 from functions import clear, write_menu, is_valid_name, erro_invalid, write_title, read_users, print_users
@@ -65,49 +66,120 @@ def comprar_tokens(user, users):
     menu_lotaria(user, users)
         
 def jogar_lotaria(user, users):
-    from saldo import jogada_lotaria
     clear()
     write_title("Lotaria")
     write_title("Comprar Bilhete")
     try:
         num = int(input("Escolha um número de 1000 a 9999: "))
-        if 1000 <= num < 10000:
-            todas_linhas = []
-            with open('register.txt', 'r') as file:
-                todas_linhas = file.readlines()
-            for i, linha in enumerate(todas_linhas):
-                partes = linha.split()
-                if len(partes) >= 7 and partes[0] == user.nome:
+        user_filename = f"{user.nome}_jogada.txt"
+        if os.path.exists(user_filename):
+            with open(user_filename, 'r') as user_file:
+                user_numbers = {line.strip() for line in user_file.readlines()}
+                if str(num) in user_numbers:
+                    print("Erro! Este número já foi escolhido pelo usuário.")
+                    time.sleep(2)
                     clear()
-                    pagamento = input("O Bilhete tem um custo de 5 tokens! Deseja continuar? Y/N\n")
-                    if pagamento.lower() == "y":
-                        if int(partes[7]) >= 5:
-                            partes[7] = str(int(partes[7]) - 5)
-                            todas_linhas[i] = " ".join(partes) + "\n"
-                            clear()
-                            print(f"Saldo Atualizado com sucesso!")
-                            time.sleep(2)
-                            with open('register.txt', 'w') as file:
-                                file.writelines(todas_linhas)    
-                            num = str(num)
-                            jogada_lotaria(user.nome, num)
-                            return
-                        else: 
-                            print("Erro! Não tem saldo!")
-                            time.sleep(2)
-                            comprar_tokens(user, users)
-                            return
-            print("Erro! Usuário não encontrado.")
+                    jogar_lotaria(user,users)
+                    return
         else:
+            user_numbers = set()
+        if not 1000 <= num < 10000:
             print("Escolha um número entre 1000 e 9999")
-            jogar_lotaria(user, users)
+            time.sleep(2)
+            clear()
+            jogar_lotaria(user,users)
+            return
+        all_user_numbers = set()
+        for filename in os.listdir():
+            if filename.endswith("_jogada.txt") and filename != user_filename:
+                with open(filename, 'r') as other_user_file:
+                    user_numbers_other = {int(line.strip()) for line in other_user_file.readlines()}
+                    all_user_numbers.update(user_numbers_other)
+
+        if num in all_user_numbers:
+            print("Erro! Este número já foi escolhido por outro jogador.")
+            time.sleep(2)
+            clear()
+            jogar_lotaria(user,users)
+            return
+        
+        todas_linhas = []
+        with open('register.txt', 'r') as file:
+            todas_linhas = file.readlines()
+
+        for i, linha in enumerate(todas_linhas):
+            partes = linha.split()
+            if len(partes) >= 7 and partes[0] == user.nome:
+                clear()
+                pagamento = input("O Bilhete tem um custo de 5 tokens! Deseja continuar? Y/N\n")
+                if pagamento.lower() == "y":
+                    saldo_atual = int(partes[7])
+                    if saldo_atual >= 5:
+                        partes[7] = str(saldo_atual - 5)
+                        todas_linhas[i] = " ".join(partes) + "\n"
+                        clear()
+
+                        with open('register.txt', 'w') as file:
+                            file.writelines(todas_linhas)
+                        print(f"Saldo Atualizado com sucesso!")
+                        time.sleep(2)
+                        
+                        with open(user_filename, 'a') as user_file:
+                            user_file.write(f"{str(num)}\n")
+                        num = str(num)
+                        print(f"Bilhetes atualizados com sucesso!")
+                        time.sleep(2)
+                        menu_lotaria(user,users)
+                        return
+                    
+                    else:
+                        print("Erro! Não tem saldo!")
+                        time.sleep(2)
+                        comprar_tokens(user, users)
+                        return
+                else:
+                    clear()
+                    print("Check-out vazio!")
+                    time.sleep(2)
+                    menu_lotaria(user,users)
     except ValueError:
         print('Valor inválido! Tente novamente')
+        time.sleep(2)
+        clear()
+        jogar_lotaria(user,users)
 
-def sorteio(user,users):
-    
-    
-    
-    
-    return print("Esta quase")
-    
+
+def sorteio(user, users):
+    from saldo import limpar_conteudo_arquivos_jogada
+    clear()
+    num_premio = 1111
+    print(f"Número premiado: {num_premio}")
+
+    write_title("Domingo anda à Roda!!!")
+    choice = input("Digite Y para começar o sorteio!\n").lower()
+
+    if choice == "y":
+        with open('register.txt', 'r') as file:
+            todas_linhas = file.readlines()
+
+        for linha in todas_linhas:
+            partes = linha.split()
+            user_filename = f"{partes[0]}_jogada.txt"
+
+            with open(user_filename, 'r') as user_file:
+                jogadas_usuario = {int(line.strip()) for line in user_file.readlines()}
+
+                if num_premio in jogadas_usuario:
+                    clear()
+                    write_title("Vencedor Lotaria")
+                    write_title(f"{partes[0]}")
+                    time.sleep(5)
+                    limpar_conteudo_arquivos_jogada()
+                    clear()
+                    menu_lotaria(user,users)
+
+    else:
+        print("Obrigado por não rodar")
+        time.sleep(2)
+        clear()
+        menu_lotaria(user, users)

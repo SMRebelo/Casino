@@ -20,7 +20,16 @@ def jogada_lotaria(username, jogada):
         filename = (f"{username}_jogada.txt")
         with open(filename, 'a') as file: 
             file.write(f"{jogada}\n")
-
+            
+def limpar_conteudo_arquivos_jogada():
+    try:
+        for filename in os.listdir():
+            if filename.endswith("_jogada.txt"):
+                with open(filename, 'w') as file:
+                    file.truncate(0)  # Limpa o conteúdo do arquivo
+                print(f"Conteúdo do arquivo {filename} limpo com sucesso.")
+    except Exception as e:
+        print(f"Erro ao limpar conteúdo dos arquivos: {e}")
 
 def menu_saldo(user, users):
     
