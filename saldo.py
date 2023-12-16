@@ -13,7 +13,14 @@ def save_transaction(username, tipo_transacao, quant):
             file.write(f"Dep: +{quant}\n")
         elif tipo_transacao == 'levantamento':
             file.write(f"Lev: -{quant}\n")
+            
+            
+def jogada_lotaria(username, jogada):
     
+        filename = (f"{username}_jogada.txt")
+        with open(filename, 'a') as file: 
+            file.write(f"{jogada}\n")
+
 
 def menu_saldo(user, users):
     
