@@ -28,8 +28,10 @@ def limpar_conteudo_arquivos_jogada():
                 with open(filename, 'w') as file:
                     file.truncate(0)  # Limpa o conteúdo do arquivo
                 print(f"Conteúdo do arquivo {filename} limpo com sucesso.")
+                time.sleep(2)
     except Exception as e:
         print(f"Erro ao limpar conteúdo dos arquivos: {e}")
+        time.sleep(2)
 
 def menu_saldo(user, users):
     

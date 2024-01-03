@@ -149,18 +149,26 @@ def jogar_lotaria(user, users):
         jogar_lotaria(user,users)
 
 
+    
+  
 def sorteio(user, users):
     from saldo import limpar_conteudo_arquivos_jogada
     clear()
-    num_premio = 1111
-    print(f"Número premiado: {num_premio}")
+    num_premio = 1212
 
     write_title("Domingo anda à Roda!!!")
+    write_title("")
+
     choice = input("Digite Y para começar o sorteio!\n").lower()
 
     if choice == "y":
         with open('register.txt', 'r') as file:
             todas_linhas = file.readlines()
+
+        premio_2_digitos = num_premio % 1000
+        premio_3_digitos = num_premio % 100
+
+        vencedores = []
 
         for linha in todas_linhas:
             partes = linha.split()
@@ -170,13 +178,26 @@ def sorteio(user, users):
                 jogadas_usuario = {int(line.strip()) for line in user_file.readlines()}
 
                 if num_premio in jogadas_usuario:
-                    clear()
-                    write_title("Vencedor Lotaria")
-                    write_title(f"{partes[0]}")
-                    time.sleep(5)
-                    limpar_conteudo_arquivos_jogada()
-                    clear()
-                    menu_lotaria(user,users)
+                    vencedores.append(partes[0])
+                elif premio_2_digitos in jogadas_usuario:
+                    vencedores.append(partes[0])
+                elif premio_3_digitos in jogadas_usuario:
+                    vencedores.append(partes[0])
+
+        if vencedores:
+            clear()
+            write_title("Vencedores Lotaria")
+            for vencedor in vencedores:
+                write_title(vencedor)
+            time.sleep(5)
+            limpar_conteudo_arquivos_jogada()
+            clear()
+            menu_lotaria(user, users)
+        else:
+            print("Não há vencedores :(")
+            time.sleep(2)
+            clear()
+            menu_lotaria(user, users)
 
     else:
         print("Obrigado por não rodar")
